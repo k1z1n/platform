@@ -1,6 +1,35 @@
 @extends('includes.layout')
 @section('content')
     @include('includes.header')
+    <h2 class="text-xl my-6 ml-5 font-bold">Дополнительное задание</h2>
+    <div id="accordion-collapse-task" data-accordion="collapse">
+        <!-- for loop -->
+        <h2 id="accordion-collapse-heading-if">
+            <button type="button" class="flex items-center justify-between w-full p-5 font-medium text-gray-500 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 gap-3" data-accordion-target="#accordion-collapse-body-if" aria-expanded="false" aria-controls="accordion-collapse-body-if">
+                <span>Цикл for</span>
+                <svg data-accordion-icon class="w-3 h-3 rotate-180 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5 5 1 1 5"/>
+                </svg>
+            </button>
+        </h2>
+        <div id="accordion-collapse-body-if" class="hidden" aria-labelledby="accordion-collapse-heading-if">
+            <div class="p-5 border border-t-0 border-gray-200 dark:border-gray-700">
+                Задание 1:<br>
+                Если температура выше 40 -> это очень жаркий день,
+                <br>
+                если температура выше 25, но меньше 40 -> это жаркий день,
+                <br>
+                если температура равна 25 градусам -> это чудесный день,
+                <br>
+                если температура ниже 25 градусов, но выше или равно 10 -> это прохладный день,
+                <br>
+                если температура ниже 10 градусов -> это холодный день.
+            </div>
+            <div class="p-5 border border-t-0 border-gray-200 dark:border-gray-700">
+                Задание 2:<br>
+                Используя цикл for, выведите таблицу умножения на 7 (от 1 до 10).
+            </div>
+        </div>
     <h2 class="text-xl my-6 ml-5 font-bold">Задание</h2>
     <div id="accordion-collapse-tasks" data-accordion="collapse">
         <!-- for loop -->
