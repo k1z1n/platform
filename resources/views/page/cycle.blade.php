@@ -74,7 +74,7 @@
             </div>
             <div class="p-5 border border-t-0 border-gray-200 dark:border-gray-700">
                 Задание 2:<br>
-                Напишите цикл while, который будет выводить квадраты чисел от 1 до 5.<br>
+                Вывести массив используя foreach<br>
                 Массив:<pre>
                     $ages = [
                         "John" => 30,
