@@ -133,11 +133,12 @@
             </button>
         </h2>
         <div id="accordion-collapse-body-for-description" class="hidden" aria-labelledby="accordion-collapse-heading-for-description">
-            <div class="p-5 flex gap-5 border border-t-0 border-gray-200 dark:border-gray-700">
-                <img src="{{ asset('images/for.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
-                <img src="{{ asset('images/примерfor.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
+            <div class="p-5 flex max-w-full gap-5 border border-t-0 border-gray-200 dark:border-gray-700">
+                <img src="{{ asset('images/for.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
+                <img src="{{ asset('images/примерfor.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
             </div>
         </div>
+
 
         <!-- while loop -->
         <h2 id="accordion-collapse-heading-while">
@@ -150,8 +151,8 @@
         </h2>
         <div id="accordion-collapse-body-while" class="hidden" aria-labelledby="accordion-collapse-heading-while">
             <div class="p-5 flex gap-5 border border-t-0 border-gray-200 dark:border-gray-700">
-                <img src="{{ asset('images/while.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
-                <img src="{{ asset('images/примерwhile.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
+                <img src="{{ asset('images/while.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
+                <img src="{{ asset('images/примерwhile.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
             </div>
         </div>
 
@@ -166,8 +167,8 @@
         </h2>
         <div id="accordion-collapse-body-do-while" class="hidden" aria-labelledby="accordion-collapse-heading-do-while">
             <div class="p-5 flex gap-5 border border-t-0 border-gray-200 dark:border-gray-700">
-                <img src="{{ asset('images/dowhile.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
-                <img src="{{ asset('images/примерdowhile.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
+                <img src="{{ asset('images/dowhile.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
+                <img src="{{ asset('images/примерdowhile.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
             </div>
         </div>
 
@@ -182,8 +183,8 @@
         </h2>
         <div id="accordion-collapse-body-foreach" class="hidden" aria-labelledby="accordion-collapse-heading-foreach">
             <div class="p-5 flex gap-5 border border-t-0 border-gray-200 dark:border-gray-700">
-                <img src="{{ asset('images/foreach.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
-                <img src="{{ asset('images/примерforeach.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
+                <img src="{{ asset('images/foreach.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
+                <img src="{{ asset('images/примерforeach.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
             </div>
         </div>
         <h2 id="accordion-collapse-heading-break">
@@ -196,8 +197,8 @@
         </h2>
         <div id="accordion-collapse-body-break" class="hidden" aria-labelledby="accordion-collapse-heading-break">
             <div class="p-5 flex gap-5 border border-t-0 border-gray-200 dark:border-gray-700">
-                <img src="{{ asset('images/break1.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
-                <img src="{{ asset('images/break2.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
+                <img src="{{ asset('images/break1.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
+                <img src="{{ asset('images/break2.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
             </div>
         </div>
         <h2 id="accordion-collapse-heading-continue">
@@ -210,8 +211,8 @@
         </h2>
         <div id="accordion-collapse-body-continue" class="hidden mb-10" aria-labelledby="accordion-collapse-heading-continue">
             <div class="p-5 flex gap-5 border border-t-0 border-gray-200 dark:border-gray-700">
-                <img src="{{ asset('images/continue1.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
-                <img src="{{ asset('images/continue2.png') }}" alt="Image for For Loop" class="w-full object-contain h-auto rounded-md">
+                <img src="{{ asset('images/continue1.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
+                <img src="{{ asset('images/continue2.png') }}" alt="Image for For Loop" class="max-w-[48%] object-contain rounded-md">
             </div>
         </div>
     </div>
