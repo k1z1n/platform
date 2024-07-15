@@ -1,6 +1,5 @@
 @extends('includes.layout')
 @section('content')
-    @include('includes.header')
     <h2 class="text-xl my-6 ml-5 font-bold">Дополнительное задание</h2>
     <div id="accordion-collapse-task" data-accordion="collapse">
         <!-- for loop -->
@@ -26,6 +25,7 @@
                 если температура ниже 10 градусов -> это холодный день.
             </div>
         </div>
+    </div>
     <h2 class="text-xl my-6 ml-5 font-bold">Задание</h2>
     <div id="accordion-collapse-tasks" data-accordion="collapse">
         <!-- for loop -->

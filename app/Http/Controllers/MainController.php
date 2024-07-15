@@ -3,23 +3,47 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 
 class MainController extends Controller
 {
-    public function pageMain()
 
+    public function getCode()
     {
-        $students = [
-            "John" => 85,
-            "Jane" => 92,
-            "Dave" => 78,
-            "Mary" => 90
-        ];
-
-        foreach ($students as $name => $score) {
-            echo "Студент: $name, Оценка: $score<br/>";
+        $path = public_path('storage/app/code.txt');
+        if (File::exists($path)) {
+            $content = File::get($path);
+            return Response::make($content, 200, [
+                'Content-Type' => 'text/plain'
+            ]);
+        } else {
+            return response('File not found', 404);
         }
+    }
+
+    public function executePhp(Request $request)
+    {
+        $code = $request->input('code'); // Получаем PHP код из тела POST запроса
+        ob_start();
+        eval('?>' . $code); // Выполняем PHP код и буферизуем вывод
+        $output = ob_get_clean();
+        return response()->json(['output' => $output]);
+    }
+
+    public function testPage()
+    {
+        return view('page.test');
+    }
+
+    public function pageMain()
+    {
         return view('page.main');
+    }
+
+    public function pageTrainingSystem()
+    {
+        return view('page.training-system');
     }
 
     public function pageCycle()
@@ -39,5 +63,10 @@ class MainController extends Controller
         }
         echo '</table>';
         return view('page.test');
+    }
+
+    public function pageGet()
+    {
+        return view('page.get');
     }
 }
