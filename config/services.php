@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'beget' => [
+        'login' => env('BEGET_API_LOGIN'),
+        'password' => env('BEGET_API_PASSWORD'),
+    ],
+
 ];

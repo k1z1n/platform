@@ -43,7 +43,7 @@ class MainController extends Controller
 
     public function pageTrainingSystem()
     {
-        return view('page.training-system');
+        return view('page.student');
     }
 
     public function pageCycle()
@@ -68,5 +68,10 @@ class MainController extends Controller
     public function pageGet()
     {
         return view('page.get');
+    }
+
+    public function pageStudy()
+    {
+        return view('page.study');
     }
 }
