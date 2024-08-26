@@ -23,11 +23,20 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $plainPassword = Str::random(10);
+
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'username' => 'Нияз',
+            'surname' => 'Гатауллин',
+            'patronymic' => 'Рамилевич',
+            'login' => 'k1z1n',
+            'group' => 'admin',
+            'logo' => null,
+            'email' => null,
+            'email_verified_at' => null,
+            'password' => Hash::make($plainPassword),
+            'pp' => $plainPassword,
+            'role' => 'admin',
             'remember_token' => Str::random(10),
         ];
     }
