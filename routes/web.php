@@ -59,3 +59,6 @@ Route::prefix('admin')->middleware('admin')->group(function () {
 
 Route::get('test-api', [\App\Http\Controllers\SeparateTaskController::class, 'test'])->name('api.test');
 Route::post('api', [\App\Http\Controllers\SeparateTaskController::class, 'register'])->name('api.register');
+
+Route::get('get', [\App\Http\Controllers\SeparateTaskController::class, 'get'])->name('get.test');
+Route::post('get', [\App\Http\Controllers\SeparateTaskController::class, 'getStore'])->name('get.register');
