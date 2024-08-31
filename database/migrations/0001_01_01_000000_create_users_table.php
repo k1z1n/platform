@@ -17,13 +17,14 @@ return new class extends Migration
             $table->string('surname');
             $table->string('patronymic');
             $table->string('login')->unique();
-            $table->string('group');
             $table->string('logo')->nullable();
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('pp');
-            $table->enum('role', ['admin', 'student', 'teacher'])->default('student');
+            $table->enum('role', ['admin', 'student', 'teacher', 'superadmin'])->default('student');
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->foreignId('group_id')->nullable()->constrained()->cascadeOnDelete();
             $table->rememberToken();
             $table->timestamps();
         });

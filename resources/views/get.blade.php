@@ -3,10 +3,10 @@
     @csrf
     <input type="submit" value="send">
 </form>
-@if(session('ss'))
-    @php
-        $response = json_decode(session('ss'), true);
-    @endphp
-
-    <pre>{{ print_r($response, true) }}</pre>
+@if(isset($result))
+    {{ $result['link'] }}<br>
+    {{ $result['ftPLogin'] }}<br>
+    {{ $result['ftPPassword'] }}<br>
+    {{ $result['dbLogin'] }}<br>
+    {{ $result['dbPassword'] }}<br>
 @endif

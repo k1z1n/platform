@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
+use App\Models\Module;
+use App\Models\Request as RequestModel;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -16,7 +19,8 @@ class StudentController extends Controller
 
     public function showCourses()
     {
-        return view('page.student.courses');
+        $courses = Course::all();
+        return view('page.student.courses', compact('courses'));
     }
 
     public function showSetting()
@@ -24,13 +28,17 @@ class StudentController extends Controller
         return view('page.student.setting');
     }
 
-    public function showOneCourse()
+    public function showOneCourse($id)
     {
-        return view('page.student.one-course');
+        $course = Course::findOrFail($id);
+        $userId = auth()->id();
+        $request = RequestModel::where('user_id', $userId)->where('course_id', $course->id)->first();
+        return view('page.student.one-course', compact('course', 'request'));
     }
 
-    public function showOneModule()
+    public function showOneModule($id)
     {
-        return view('page.student.one-module');
+        $module = Module::findOrFail($id);
+        return view('page.student.one-module', compact('module'));
     }
 }

@@ -16,6 +16,8 @@
     },
     "dependencies": {
         "apexcharts": "^3.52.0",
+        "boxicons": "^2.1.4",
+        "froala-editor": "^4.2.1",
         "monaco-editor": "^0.50.0"
     }
 }

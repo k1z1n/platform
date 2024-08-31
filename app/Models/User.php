@@ -26,8 +26,18 @@ class User extends Authenticatable
         'email',
         'password',
         'pp',
-        'role'
+        'role',
+        'group_id'
     ];
+
+    public function group(){
+        return $this->belongsTo(Group::class);
+    }
+
+    public function requests()
+    {
+        return $this->hasMany(Request::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

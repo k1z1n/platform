@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Database;
+use App\Models\FileZilla;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +24,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+        View::composer('*', function ($view) {
+            $fileZilla = FileZilla::where('user_id', auth()->id())->first();
+            $database = Database::where('user_id', auth()->id())->first();
+            $view->with('fileZilla', $fileZilla);
+            $view->with('database', $database);
+        });
+
         // Используем Tailwind CSS для пагинации
         Paginator::useTailwind();
 

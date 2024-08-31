@@ -15,9 +15,10 @@ class CheckAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->guest() && auth()->user()->role === 'admin') {
+        if (auth()->check() && auth()->user()->role === 'admin') {
             return $next($request);
         }
-        return redirect()->route('login');
+
+        return redirect()->route('login'); // Перенаправляем на страницу входа, если не администратор
     }
 }

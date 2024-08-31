@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Middleware\CheckAdmin;
-use App\Http\Middleware\CheckAuth;
+use App\Http\Middleware\CheckStudent;
+use App\Http\Middleware\CheckTeacher;
+use App\Http\Middleware\RedirectIfAuthenticated;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,8 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-           'auth' => CheckAuth::class,
-           'admin' => CheckAdmin::class,
+           'auth' => RedirectIfAuthenticated::class,
+            'student' => CheckStudent::class,
+            'teacher' => CheckTeacher::class,
+            'admin' => CheckAdmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

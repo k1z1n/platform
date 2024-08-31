@@ -40,6 +40,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login'); // Перенаправление на главную страницу или другую
+        return redirect()->route('login');
     }
 }

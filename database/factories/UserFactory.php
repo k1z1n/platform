@@ -30,7 +30,6 @@ class UserFactory extends Factory
             'surname' => 'Гатауллин',
             'patronymic' => 'Рамилевич',
             'login' => 'k1z1n',
-            'group' => 'admin',
             'logo' => null,
             'email' => null,
             'email_verified_at' => null,

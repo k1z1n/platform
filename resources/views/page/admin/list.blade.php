@@ -21,7 +21,7 @@
                                     </li>
                                     @foreach($groups as $item)
                                         <li>
-                                            <button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onclick="setCategory('{{ $item }}')">{{ $item }}</button>
+                                            <button type="button" class="inline-flex w-full px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onclick="setCategory('{{ $item->id }}')">{{ $item->title }}</button>
                                         </li>
                                     @endforeach
                                 </ul>
@@ -49,14 +49,14 @@
                     <script>
                         function setCategory(category) {
                             document.getElementById('selected-category').value = category;
-                            document.getElementById('dropdown-text').innerText = category || 'Все группы';
+                            let selectedText = category ? @json($groups->pluck('title', 'id'))[category] : 'Все группы';
+                            document.getElementById('dropdown-text').innerText = selectedText;
                         }
 
-                        // On page load, set the dropdown button text if a category is selected
                         document.addEventListener('DOMContentLoaded', function () {
                             let selectedCategory = document.getElementById('selected-category').value;
                             if (selectedCategory) {
-                                document.getElementById('dropdown-text').innerText = selectedCategory;
+                                document.getElementById('dropdown-text').innerText = @json($groups->pluck('title', 'id'))[selectedCategory];
                             }
                         });
                     </script>
@@ -100,7 +100,7 @@
                                 <td class="py-2 px-4 border-b text-center">{{ $student->username }}</td>
                                 <td class="py-2 px-4 border-b text-center">{{ $student->surname }}</td>
                                 <td class="py-2 px-4 border-b text-center">{{ $student->patronymic }}</td>
-                                <td class="py-2 px-4 border-b text-center">{{ $student->group }}</td>
+                                <td class="py-2 px-4 border-b text-center">{{ $student->group->title }}</td>
                                 <td class="py-2 px-4 border-b">
                                     <div class="flex items-center justify-center">
                                         <button class="copy-btn" data-login="{{ $student->login }}" data-password="{{ $student->pp }}">
