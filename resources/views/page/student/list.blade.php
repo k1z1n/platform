@@ -1,13 +1,18 @@
 @extends('includes.layout')
 @section('h2-name', 'Главная')
 @section('content')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.16/css/froala_editor.min.css" rel="stylesheet" type="text/css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.16/css/froala_style.min.css" rel="stylesheet" type="text/css" />
-    @foreach($lists as $list)
-        <div class="fr-view">
-            {!! $list->mixed_content !!}
-        </div>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <div class="container">
+        <h1>Список Контента</h1>
 
-    @endforeach
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.16/js/froala_editor.min.js"></script>
+        @foreach($lists as $content)
+            <div class="content-item">
+                <h2>Контент {{ $content->id }}</h2>
+                <!-- Здесь просто выводим HTML контент, сохраненный в базе данных -->
+                <div class="editor">
+                    {!! $content->mixed_content !!}
+                </div>
+            </div>
+        @endforeach
+    </div>
 @endsection

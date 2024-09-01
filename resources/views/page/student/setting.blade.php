@@ -30,59 +30,61 @@
             </form>
         </div>
     </div>
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Create Content</title>
+    <!-- Include Quill stylesheet -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
-        <!-- Подключение стилей Froala -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.16/css/froala_editor.min.css" rel="stylesheet" type="text/css" />
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.16/css/froala_style.min.css" rel="stylesheet" type="text/css" />
-
-        <!-- Подключение скриптов Froala -->
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.16/js/froala_editor.min.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    </head>
-    <body>
+    <!-- Include Quill library -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <div class="container">
         <h1>Создать Контент</h1>
 
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <!-- Форма создания контента -->
-        <form method="POST" action="{{ route('student.content.store') }}" enctype="multipart/form-data">
-            @csrf
-            <textarea id="editor" name="content"></textarea>
-            <button type="submit">Сохранить</button>
-        </form>
+            <form id="quillForm" method="POST" action="{{ route('student.content.store') }}">
+                @csrf
+        <div id="editor">
+        </div>
+                <input type="hidden" id="quillContent" name="content">
+                <button type="submit">Save</button>
+            </form>
 
-        <!-- Инициализация Froala Editor -->
+        <!-- Подключение скриптов Quill -->
+{{--        <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>--}}
         <script>
-            $(function() {
-                new FroalaEditor('#editor', {
-                    toolbarButtons: ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'paragraphFormat', 'align', 'formatOL', 'formatUL', 'outdent', 'indent', 'insertLink', 'insertImage', 'insertFile', 'insertVideo', 'undo', 'redo'],
-                    pluginsEnabled: ['align', 'codeBeautifier', 'codeView', 'colors', 'draggable', 'embedly', 'emoticons', 'file', 'fontFamily', 'fontSize', 'fullscreen', 'image', 'imageManager', 'inlineStyle', 'lineBreaker', 'link', 'lists', 'paragraphFormat', 'paragraphStyle', 'quickInsert', 'quote', 'save', 'table', 'url', 'video', 'wordPaste'],
-                    heightMin: 300,
+            var quill = new Quill('#editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        // Основные форматирования
+                        [{ 'font': [] }, { 'size': [] }],
+                        ['bold', 'italic', 'underline', 'strike'], // жирный, курсив, подчеркнутый, зачеркнутый
+                        [{ 'color': [] }, { 'background': [] }], // цвет текста, цвет фона
+                        ['blockquote', 'code-block'], // цитата, код
 
-                    // Настройки загрузки изображений
-                    imageUploadURL: '{{ route('student.froala.upload') }}',  // URL для обработки загрузки изображений
-                    imageUploadParams: {
-                        _token: '{{ csrf_token() }}'  // Защита от CSRF в Laravel
-                    },
-                    imageInsertButtons: ['imageBack', '|', 'imageUpload', 'imageByURL'], // Добавляет кнопки загрузки и вставки изображений из URL
-                    imageEditButtons: ['imageReplace', 'imageAlign', 'imageRemove', 'imageLink', 'linkOpen', 'linkEdit', 'linkRemove', '-', 'imageDisplay', 'imageStyle', 'imageAlt', 'imageSize']
-                });
+                        // Форматирование текста
+                        [{ 'header': 1 }, { 'header': 2 }, { 'header': 3 }, { 'header': 4 }], // заголовки
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }], // упорядоченный, маркированный список
+                        [{ 'script': 'sub'}, { 'script': 'super' }], // подстрочный, надстрочный текст
+                        [{ 'indent': '-1'}, { 'indent': '+1' }], // уменьшить/увеличить отступ
+                        [{ 'direction': 'rtl' }], // направление текста
+
+                        // Стили текста
+                        [{ 'align': [] }], // выравнивание текста
+
+                        // Вставка медиа и разделителей
+                        ['link', 'image', 'video', 'formula'], // ссылка, изображение, видео, формула
+
+                        // Управление и очистка
+                        ['clean'] // очистить форматирование
+                    ]
+                }
+            });
+            document.getElementById('quillForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                var content = quill.root.innerHTML;
+                document.getElementById('quillContent').value = content;
+                this.submit();
             });
         </script>
     </div>
-    </body>
-    </html>
-
 
 @endsection

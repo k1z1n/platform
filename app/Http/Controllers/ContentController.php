@@ -45,7 +45,7 @@ class ContentController extends Controller
             'mixed_content' => $validated['content']
         ]);
 
-        return redirect()->route('content.create')->with('success', 'Контент сохранен успешно!');
+        return redirect()->route('student.student.list')->with('success', 'Контент сохранен успешно!');
     }
 
     public function uploadImage(Request $request)
