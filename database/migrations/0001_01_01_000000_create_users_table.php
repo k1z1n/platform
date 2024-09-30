@@ -22,9 +22,10 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('pp');
+            $table->string('telegram_username')->nullable();
             $table->enum('role', ['admin', 'student', 'teacher', 'superadmin'])->default('student');
             $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->foreignId('group_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('group_id')->nullable()->constrained();
             $table->rememberToken();
             $table->timestamps();
         });

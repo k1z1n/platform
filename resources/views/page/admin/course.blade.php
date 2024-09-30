@@ -1,39 +1,39 @@
 @extends('includes.layout')
 @section('h2-name', 'Редактирование курса: '. $course->title)
 @section('content')
-    <div class="flex gap-5 h-full flex-col">
-        <div class="w-full flex gap-5 h-full">
-            <form action="{{ route('admin.store.course') }}" method="post" class="flex gap-5 h-full w-full" enctype="multipart/form-data">
+    <div class="flex gap-5 flex-col">
+        <div class="w-full flex gap-5">
+            <form action="{{ route('admin.store.course') }}" method="post" class="flex gap-5 w-full" enctype="multipart/form-data">
                 @csrf
-                <div class="w-1/4 bg-white rounded-xl flex flex-col items-center p-4 gap-3 h-full">
-                    <div class="flex items-center justify-center w-full h-full">
+                <div class="w-1/4 bg-white rounded-xl flex flex-col items-center p-4 gap-3">
+                    <div class="flex items-center justify-center w-full">
                         <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                             <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                <img src="{{ asset('storage/' . $course->logo) }}" alt="" class="object-cover h-full max-h-36">
+                                <img src="{{ asset('storage/' . $course->logo) }}" alt="" class="object-cover max-h-36">
                             </div>
                             <input id="dropzone-file" type="file" class="hidden" name="logo" />
                         </label>
                     </div>
                     <input type="text" value="{{ $course->title }}" id="last_name" name="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Название"/>
                 </div>
-                <div class="w-3/4 bg-white rounded-xl px-4 pt-4 pb-3 flex flex-col gap-3 justify-between h-full">
-                    <textarea id="message" name="description" rows="1" class="p-2.5 w-full h-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow" placeholder="Небольшое описание курса...">{{ $course->description }}</textarea>
+                <div class="w-3/4 bg-white rounded-xl px-4 pt-4 pb-3 flex flex-col gap-3 justify-between">
+                    <textarea id="message" name="description" rows="1" class="p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 flex-grow" placeholder="Небольшое описание курса...">{{ $course->description }}</textarea>
                     <button type="submit" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
                         Изменить курс
                     </button>
                 </div>
             </form>
         </div>
-        <h3 class="text-center font-bold text-lg">Добавить модуль для курса</h3>
-        <a href="{{ route('admin.add.module', $course->id) }}">Добавить модуль</a>
+        <a href="{{ route('admin.add.module', $course->id) }}" class="text-center font-bold text-lg mb-6">Добавить модуль для курса</a>
+{{--        <a href="{{ route('admin.add.module', $course->id) }}">Добавить модуль</a>--}}
     </div>
     @foreach($modules as $module)
-        <div class="flex bg-white p-4 items-center justify-between rounded-xl">
+        <div class="flex bg-white p-4 items-center justify-between rounded-xl mb-4  ">
             <div class="">
-            {{ $module->comment }}
+            {{ $module->title }}
             </div>
             <div class="flex gap-5">
-            <a href=""><i class='bx bx-pencil'></i></a>
+            <a href="{{ route('admin.edit.module', $module->id) }}"><i class='bx bx-pencil'></i></a>
             <button data-modal-target="popup-modal-{{ $module->id }}" data-modal-toggle="popup-modal-{{ $module->id }}" class="block text-black" type="button">
                 <i class='bx bxs-trash'></i>
             </button>

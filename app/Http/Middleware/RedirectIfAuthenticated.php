@@ -11,7 +11,9 @@ class RedirectIfAuthenticated
     /**
      * Handle an incoming request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -23,6 +25,9 @@ class RedirectIfAuthenticated
             if ($currentRoute === 'login') {
                 return $next($request);
             }
+            if ($currentRoute === 'login.store') {
+                return $next($request);
+            }
 
             // Перенаправить неавторизованного пользователя на страницу логина
             return redirect()->route('login');
@@ -31,9 +36,9 @@ class RedirectIfAuthenticated
         // Пользователь авторизован
         $user = auth()->user();
 
-        // Если пользователь с ролью 'superadmin', пропускаем проверку ролей и разрешаем доступ к любой странице
-        if ($user->role === 'superadmin') {
-            return $next($request);
+        // Если пользователь авторизован и находится на странице логина, перенаправить в зависимости от роли
+        if ($currentRoute === 'login') {
+            return $this->redirectToRoleMainPage($user);
         }
 
         // Исключаем маршрут 'logout' из проверки ролей
@@ -42,26 +47,51 @@ class RedirectIfAuthenticated
         }
 
         // Проверка роли пользователя и доступных маршрутов
-        switch ($user->role) {
-            case 'student':
-                if (!str_starts_with($currentRoute, 'student.')) {
-                    return redirect()->route('student.main');
-                }
-                break;
-            case 'teacher':
-                if (!str_starts_with($currentRoute, 'teacher.')) {
-                    return redirect()->route('teacher.main');
-                }
-                break;
-            case 'admin':
-                if (!str_starts_with($currentRoute, 'admin.')) {
-                    return redirect()->route('admin.main');
-                }
-                break;
-            default:
-                return redirect()->route('login');
+        if (!$this->isUserAllowedOnRoute($user, $currentRoute)) {
+            return $this->redirectToRoleMainPage($user);
         }
 
         return $next($request);
+    }
+
+    /**
+     * Проверка, может ли пользователь получить доступ к текущему маршруту
+     *
+     * @param  \App\Models\User  $user
+     * @param  string  $route
+     * @return bool
+     */
+    protected function isUserAllowedOnRoute($user, $route): bool
+    {
+        switch ($user->role) {
+            case 'student':
+                return str_starts_with($route, 'student.');
+            case 'teacher':
+                return str_starts_with($route, 'teacher.');
+            case 'admin':
+                return str_starts_with($route, 'admin.');
+            case 'superadmin':
+                return true; // superadmin может посещать любые маршруты
+        }
+
+        return false;
+    }
+
+    /**
+     * Перенаправление пользователя на основную страницу в зависимости от его роли
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function redirectToRoleMainPage($user)
+    {
+        switch ($user->role) {
+            case 'student':
+                return redirect()->route('student.main');
+            case 'teacher':
+                return redirect()->route('teacher.main');
+            case 'admin':
+                return redirect()->route('admin.main');
+        }
     }
 }

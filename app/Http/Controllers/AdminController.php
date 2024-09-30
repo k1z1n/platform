@@ -6,29 +6,130 @@ use App\Models\Course;
 use App\Models\Database;
 use App\Models\FileZilla;
 use App\Models\Group;
-use App\Models\Request as RequestModel;
 use App\Models\Module;
+use App\Models\Request as RequestModel;
 use App\Models\Subdomain;
+use App\Models\Task;
+use App\Models\TeacherCourseGroup;
 use App\Models\User;
 use App\Services\BegetAPIService;
+use App\Services\BegetDatabaseService;
+use App\Services\CourseService;
+use App\Services\FileZillaService;
+use App\Services\GroupService;
+use App\Services\HelperService;
+use App\Services\ModuleService;
+use App\Services\SubdomainService;
+use App\Services\TelegramService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
+    /**
+     * Сервис для работы с API Beget (хостинг).
+     * @var BegetAPIService
+     */
     protected BegetAPIService $begetApiService;
 
-    public function __construct(BegetAPIService $begetApiService)
+    /**
+     * Сервис для взаимодействия с Telegram ботом.
+     * @var TelegramService
+     */
+    protected TelegramService $telegramService;
+
+    /**
+     * Сервис для управления поддоменами.
+     * @var SubdomainService
+     */
+    protected SubdomainService $subdomainService;
+
+    /**
+     * Сервис для управления базой данных Beget.
+     * @var BegetDatabaseService
+     */
+    protected BegetDatabaseService $begetDatabaseService;
+
+    /**
+     * Сервис для управления FileZilla Beget.
+     * @var FileZillaService
+     */
+    protected FileZillaService $fileZillaService;
+
+    /**
+     * Сервис для управления пользователем.
+     * @var UserService
+     */
+    protected UserService $userService;
+
+    protected ModuleService $moduleService;
+    protected HelperService $helperService;
+    protected CourseService $courseService;
+    protected GroupService $groupService;
+
+    /**
+     * Символ, отображающий успешное выполнение операции.
+     * @var string
+     */
+    private string $completed = '✅';
+
+    /**
+     * Символ, отображающий ошибку при выполнении операции.
+     * @var string
+     */
+    private string $error = '🚫';
+
+    /**
+     * Telegram username текущего пользователя.
+     * @var ?string
+     */
+    private ?string $telegramUsername;
+
+    /**
+     * Конструктор, в котором происходит инъекция зависимостей.
+     *
+     * @param BegetAPIService $begetApiService Сервис для работы с API Beget.
+     * @param TelegramService $telegramService Сервис для работы с Telegram.
+     * @param SubdomainService $subdomainService Сервис для управления поддоменами.
+     * @param BegetDatabaseService $begetDatabaseService Сервис для управления базой данных Beget.
+     * @param FileZillaService $fileZillaService Сервис для управления FileZilla Beget.
+     * @param UserService $userService Сервис для управления пользователем.
+     */
+    public function __construct(
+        BegetAPIService      $begetApiService,
+        TelegramService      $telegramService,
+        SubdomainService     $subdomainService,
+        BegetDatabaseService $begetDatabaseService,
+        FileZillaService     $fileZillaService,
+        UserService          $userService,
+        ModuleService        $moduleService,
+        HelperService        $helperService,
+        CourseService        $courseService,
+        GroupService         $groupService,
+    )
     {
         $this->begetApiService = $begetApiService;
+        $this->subdomainService = $subdomainService;
+        $this->telegramService = $telegramService;
+        $this->begetDatabaseService = $begetDatabaseService;
+        $this->fileZillaService = $fileZillaService;
+        $this->userService = $userService;
+        $this->moduleService = $moduleService;
+        $this->helperService = $helperService;
+        $this->courseService = $courseService;
+        $this->groupService = $groupService;
     }
+
 
     public function showMain()
     {
         return view('page.admin.main');
     }
+
     public function showGenerate()
     {
         $groups = Group::all();
@@ -37,92 +138,46 @@ class AdminController extends Controller
 
     public function createUser(Request $request)
     {
-        // Создаем объект валидатора для валидации данных пользователя
-        $validator = Validator::make($request->all(), [
-            'username' => 'required|max:255',
-            'surname' => 'required|max:255',
-            'patronymic' => 'required|max:255',
-            'group_id' => 'required',
-        ], [
-            'username.required' => 'Имя обязательно для заполнения.',
-            'surname.required' => 'Фамилия обязательна для заполнения.',
-            'patronymic.required' => 'Отчество обязательно для заполнения.',
-            'group_id.required' => 'Группа обязательна для заполнения.',
-            'group_id.numeric' => 'Группа должна быть числом.',
-        ]);
+        $user = $this->userService->createUser($request);
 
-        // Проверяем, есть ли ошибки валидации
-        if ($validator->fails()) {
-            return redirect()->back()->with('error', 'Ошибка валидации')->withErrors($validator)->withInput();
+        if (!is_array($user)) {
+            return $this->helperService->returnBackWithError('Ошибка создания пользователя.');
         }
 
-        // Получаем валидированные данные
-        $validatedData = $validator->validated();
+        $login = $user['login'];
+        $role = $user['user']->role;
+        $userID = $user['user']->id;
 
-        // Генерация уникального логина
-        $baseLogin = collect(['username', 'patronymic'])
-            ->map(fn($field) => Str::slug(Str::substr($request->input($field), 0, 2)))
-            ->implode('');
+        if ($role === 'student') {
+            $createDomain = $this->begetApiService->createSiteAndRetrieveIds($login);
 
-        $login = $baseLogin;
-        $counter = 1;
+            if ($createDomain['status'] === 'success') {
+                $this->fileZillaService->createFileZilla([
+                    'host' => 'k1z1nksb.beget.tech',
+                    'username' => $createDomain['ftPLogin'],
+                    'password' => $createDomain['ftPPassword'],
+                    'user_id' => $userID,
+                ]);
 
-        while (User::where('login', $login)->exists()) {
-            $login = $baseLogin . $counter;
-            $counter++;
+                $this->subdomainService->createSubdomain([
+                    'title' => $createDomain['link'],
+                    'user_id' => $userID,
+                ]);
+
+                $this->begetDatabaseService->createBegetDatabase([
+                    'username' => $createDomain['dbLogin'],
+                    'password' => $createDomain['dbPassword'],
+                    'user_id' => $userID,
+                ]);
+
+            } else {
+                $user['user']->delete();
+                return $this->helperService->returnBackWithError('Ошибка при создании сайта и поддомена.');
+            }
         }
 
-        // Генерация пароля
-        $password = Str::random(8);
-
-        // Определение роли пользователя
-        $groupId = $request->input('group_id');
-        $groupName = Group::findOrFail($groupId)->title;
-        $role =  $groupName === 'Администратор' ? 'admin' : 'student';
-        // Создание нового пользователя
-        $user = User::create([
-            'username' => $validatedData['username'],
-            'surname' => $validatedData['surname'],
-            'patronymic' => $validatedData['patronymic'],
-            'login' => $login,
-            'group_id' => $groupId,
-            'password' => Hash::make($password),
-            'pp' => $password,
-            'role' => $role,
-        ]);
-
-        // Создание домена и получение необходимых данных для добавления в таблицы
-        $createDomain = $this->begetApiService->createSiteAndRetrieveIds($login);
-
-        // Проверка успешности создания домена и добавление данных в таблицы
-        if ($createDomain['status'] === 'success') {
-            // Добавление данных в таблицу file_zillas
-            FileZilla::create([
-                'host' => 'k1z1nksb.beget.tech',
-                'username' => $createDomain['ftPLogin'],
-                'password' => $createDomain['ftPPassword'],
-                'user_id' => $user->id,
-            ]);
-
-            // Добавление данных в таблицу subdomains
-            Subdomain::create([
-                'title' => $createDomain['link'],
-                'user_id' => $user->id,
-            ]);
-
-            // Добавление данных в таблицу databases
-            Database::create([
-                'username' => $createDomain['dbLogin'],
-                'password' => $createDomain['dbPassword'],
-                'user_id' => $user->id,
-            ]);
-        } else {
-            return redirect()->back()->with('error', 'Ошибка при создании сайта и поддомена.');
-        }
-
-        return redirect()->back()->with('success', 'Пользователь успешно создан');
+        return $this->helperService->returnWithSuccess('admin.generate', 'Пользователь успешно создан.');
     }
-
 
 
 
@@ -184,27 +239,20 @@ class AdminController extends Controller
 
     public function storeCourse(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|max:255',
-            'description' => 'required|max:255',
-            'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:10048',
-        ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->with('error', 'Ошибка валидации')->withErrors($validator)->withInput();
-        }
+        $data = $this->courseService->createCourse($request);
 
-        if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('courses/logos', 'public');
-            $data = $validator->validated();
+        $logoPath = $this->helperService->uploadFile($request, 'logo', 'courses/logos');
+
+        if ($logoPath) {
             $data['logo'] = $logoPath;
         } else {
-            return redirect()->back()->with('error', 'Ошибка загрузки файла')->withInput();
+            return $this->helperService->returnBackWithError('Ошибка загрузки файла');
         }
 
         Course::create($data);
 
-        return redirect()->route('admin.courses')->with('success', 'Курс успешно добавлен');
+        return $this->helperService->returnWithSuccess('admin.courses', 'Курс успешно добавлен');
     }
 
     public function showAddGroup()
@@ -214,46 +262,39 @@ class AdminController extends Controller
 
     public function storeGroup(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->with('error', 'Ошибка валидации')->withErrors($validator)->withInput();
-        }
-
-        $data = $validator->validated();
+        $data = $this->groupService->createGroup($request);
 
         Group::create($data);
 
-        return redirect()->route('admin.groups')->with('success', 'Курс успешно добавлен');
+        $this->telegramService->sendMessageToUsername($this->userService->getTelegramUsername(), 'ADMIN: ' . "группа " . $request->input('title') . " создана");
+
+        return $this->helperService->returnWithSuccess('admin.groups', "Группа " . $request->input('title') . " успешно добавлена");
     }
 
     public function deleteGroup($id)
     {
         $group = Group::findOrFail($id);
+
+        $title = $group->title;
+
         $group->delete();
-        return redirect()->route('page.admin.groups')->with('success', 'Группы успешно удалена');
+
+        $this->telegramService->sendMessageToUsername($this->userService->getTelegramUsername(), 'ADMIN: ' . "группа " . $title . " удалена");
+
+        return $this->helperService->returnWithSuccess('admin.groups', 'Группа успешно удалена');
     }
 
     public function updateGroup(Request $request, $id)
     {
         $group = Group::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|max:255',
-            'link' => 'required|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->with('error', 'Ошибка валидации')->withErrors($validator)->withInput();
-        }
-
-        $data = $validator->validated();
+        $data = $this->groupService->updateGroup($request, $id);
 
         $group->update($data);
 
-        return redirect()->route('admin.groups')->with('success', 'Курс успешно обновлен');
+        $this->telegramService->sendMessageToUsername($this->userService->getTelegramUsername(), 'ADMIN: ' . "группа " . $request->input('title') . " обновлена");
+
+        return $this->helperService->returnWithSuccess('admin.groups', 'Группа успешно обновлена');
     }
 
     public function showGroups()
@@ -269,55 +310,159 @@ class AdminController extends Controller
 
     public function storeModule(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|max:255',
-            'comment' => 'nullable|max:255',
-            'theory' => 'required|max:255',
-            'task' => 'required|max:255',
-            'stat' => 'required|in:theory,practice',
-            'status' => 'required|in:necessarily,not necessary',
-            'course_id' => 'required|exists:courses,id',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->with('error', 'Ошибка валидации')->withErrors($validator)->withInput();
-        }
-
-        $data = $validator->validated();
+        $data = $this->moduleService->createModule($request);
 
         Module::create($data);
 
         $courseId = $data['course_id'];
 
-        return redirect()->route('admin.show.course', $courseId)->with('success', 'Модуль успешно добавлен');
+        return $this->helperService->returnWithSuccess('admin.show.course', 'Модуль успешно добавлен', $courseId);
     }
 
-    public function destroyModule($id){
+    public function editModule($id)
+    {
+        $module = Module::findOrFail($id);
+        return view('page.admin.edit-module', compact('module'));
+    }
+
+    public function updateModule(Request $request, $id)
+    {
+
+        $module = Module::findOrFail($id);
+
+        $data = $this->moduleService->updateModule($request, $module);
+
+        $module->update($data);
+
+        $courseId = $data['course_id'];
+
+        return $this->helperService->returnWithSuccess('admin.show.course', 'Модуль успешно обновлен', $courseId);
+    }
+
+    public function destroyModule($id)
+    {
         $module = Module::findOrFail($id);
         $courseId = $module->course;
         $module->delete();
-        return redirect()->route('admin.show.course', $courseId)->with('success', 'Модель успешно удален');
+
+        return $this->helperService->returnWithSuccess('admin.show.course', 'Модуль успешно удален', $courseId);
     }
 
     public function showRequests()
     {
         $requests = RequestModel::orderByRaw("status = 'pending' desc")->orderBy('status', 'asc')->paginate(10);
+        foreach ($requests as $item) {
+            $userId = $item->user_id;
+            $user = User::where('id', $userId)->first();
+            $group = $user->group->title;
+            $item['group'] = $group;
+        }
         return view('page.admin.requests', compact('requests'));
     }
+
     public function updateRequest(Request $request, $id)
     {
-        // Валидация данных
         $validatedData = $request->validate([
             'status' => 'required|in:pending,accepted,rejected',
         ]);
 
-        // Найти заявку по ID
         $requestModel = RequestModel::findOrFail($id);
 
-        // Обновить статус заявки
         $requestModel->status = $validatedData['status'];
         $requestModel->save();
 
         return redirect()->back()->with('success', 'Статус заявки успешно обновлен.');
+    }
+
+    public function showTasks()
+    {
+        $tasks = Task::orderByRaw("FIELD(status, 'pending', 'failed', 'completed')")->paginate(10);
+
+        return view('page.admin.tasks', compact('tasks'));
+    }
+
+    public function showTeachers()
+    {
+        $assignedTeachers = DB::table('teacher_course_groups')
+            ->join('users', 'teacher_course_groups.teacher_id', '=', 'users.id')
+            ->join('courses', 'teacher_course_groups.course_id', '=', 'courses.id')
+            ->join('groups', 'teacher_course_groups.group_id', '=', 'groups.id')
+            ->select(
+                'users.username',
+                'users.surname',
+                'users.id as teacher_id',
+                'courses.id as course_id',
+                'groups.id as group_id',
+                'groups.title as group_title',
+                'courses.title as course_title'
+            )
+            ->get();
+        $teachers = User::where('role', 'teacher')->get();
+        $groups = Group::all();
+        $courses = Course::all();
+        return view('page.admin.teachers', compact('groups', 'courses', 'teachers', 'assignedTeachers'));
+    }
+
+    public function getCoursesForUsers($groupId, $teacherId)
+    {
+        $courses = Course::whereHas('requests', function ($query) use ($groupId) {
+            $query->whereHas('user', function ($subQuery) use ($groupId) {
+                $subQuery->where('group_id', $groupId);
+            });
+        })->with(['requests' => function ($query) use ($groupId) {
+            $query->whereHas('user', function ($subQuery) use ($groupId) {
+                $subQuery->where('group_id', $groupId);
+            });
+        }])->get();
+
+        // Получаем существующие связи для преподавателя
+        $existingAssignments = DB::table('teacher_course_groups')
+            ->where('teacher_id', $teacherId)
+            ->where('group_id', $groupId)
+            ->pluck('course_id')
+            ->toArray();
+
+        // Возвращаем список курсов и отмеченные курсы
+        return response()->json([
+            'courses' => $courses,
+            'existingAssignments' => $existingAssignments
+        ]);
+    }
+
+    public function assignTeacherToGroupAndCourses(Request $request)
+    {
+        $teacherId = $request->input('teacher');
+        $groupId = $request->input('group');
+        $courseIds = $request->input('courses', []);
+
+        if ($teacherId && $groupId && !empty($courseIds)) {
+            foreach ($courseIds as $courseId) {
+                TeacherCourseGroup::create([
+                    'teacher_id' => $teacherId,
+                    'course_id' => $courseId,
+                    'group_id' => $groupId,
+                ]);
+            }
+            return redirect()->back()->with('success', 'Связи успешно созданы.');
+        } else {
+            return redirect()->back()->with('error', 'Ошибка, проверьте заполненность полей.');
+        }
+    }
+
+    public function setting()
+    {
+        return view('page.admin.setting');
+    }
+
+    public function updateTelegramUserName(Request $request)
+    {
+        $userId = auth()->id();
+        $this->telegramService->updateTelegramUsers();
+        $isUpdate = $this->userService->updateTelegramUserName($request, $userId);
+        if($isUpdate){
+            $this->helperService->returnWithSuccess('admin.setting', 'Ник успешно обновлен.');
+        }else{
+            $this->helperService->returnBackWithError('Не удалось обновить ник;');
+        }
     }
 }

@@ -1,192 +1,80 @@
 @extends('includes.layout')
+@section('h2-name', 'Настройки')
 @section('content')
-    <div class="sidebar">
-        <a href="#" class="logo">
-            <i class='bx bx-code-alt'></i>
-            <div class="logo-name">Платформа</div>
-        </a>
-        <ul class="side-menu">
-            <li class="{{ request()->is('student') ? 'active' : '' }}">
-                <a href="{{ route('student.main') }}">
-                    <i class='bx bxs-dashboard'></i> Главная
-                </a>
-            </li>
-            {{--            <li><a href="#"><i class='bx bx-store-alt'></i>Группы</a></li>--}}
-            <li class="{{ request()->is('student/courses') ? 'active' : '' }}">
-                <a href="{{ route('student.courses') }}">
-                    <i class='bx bx-analyse'></i> Курсы
-                </a>
-            </li>
-            {{--            <li><a href="#"><i class='bx bx-message-square-dots'></i>Запросы</a></li    >--}}
-            {{--            <li><a href="#"><i class='bx bx-group'></i>Пользователи</a></li>--}}
-            <li class="{{ request()->is('student/setting') ? 'active' : '' }}"><a href="{{ route('student.setting') }}"><i class='bx bx-cog'></i>Настройки</a></li>
-        </ul>
-        <ul class="side-menu">
-            <li>
-                <a href="#" class="logout">
-                    <i class='bx bx-log-out-circle'></i>
-                    Выход
-                </a>
-            </li>
-        </ul>
-    </div>
-    <!-- End of Sidebar -->
-
-    <!-- Main Content -->
-    <div class="content">
-        <nav>
-            <i class='bx bx-menu'></i>
-            <form action="#">
-                <h2 class="text-xl">Главная</h2>
+    <div class="flex gap-5 flex-col">
+        <div class="bg-white rounded-xl px-5 pt-5 pb-4 flex flex-col">
+            <h2 class="text-xl mb-4">Сменить аватар</h2>
+            <div class="flex"></div>
+            <img src="{{ asset('images/user.png') }}" alt="" class="w-16 flex justify-center mb-4">
+            <form action="" method="post">
+                <input
+                    class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                    aria-describedby="file_input_help" id="file_input" type="file">
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG
+                    or GIF (MAX. 800x400px).</p>
+                <input type="submit"
+                       class="bg-gray-900 mt-3 cursor-pointer text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                       value="Сменить">
             </form>
-            <input type="checkbox" id="theme-toggle" hidden>
-            <label for="theme-toggle" class="theme-toggle"></label>
-            <a href="#" class="notif">
-                <i class='bx bx-bell'></i>
-                <span class="count">12</span>
-            </a>
-            <a href="#" class="profile">
-                <img src="{{ asset('images/user.png') }}" alt="">
-            </a>
-        </nav>
-        <main class="flex gap-4">
-            <div class="w-3/4 gap-5">
-                <div class="grid grid-cols-3 gap-5">
-                    <div class="bg-white rounded-xl p-3 flex flex-col items-center gap-3 justify-center">
-                        {{--                        php--}}
-                        <img src="{{ asset('images/php.png') }}" alt="" class="h-full max-h-36">
-                        <h4 class="text-md">PHP</h4>
-                    </div>
-                    <div class="bg-white rounded-xl p-3 flex flex-col items-center gap-3 justify-center">
-                        <img src="{{ asset('images/html.png') }}" alt="" class="h-full max-h-36">
-                        <h4 class="text-md">html+css</h4>
-                    </div>
-                    <div class="bg-white rounded-xl"></div>
-                </div>
-                <h3 class="mb-3 text-lg mt-5 ml-2 font-bold">Доступные для проверки</h3>
-                <div class="bg-gray-100 flex flex-col gap-5 rounded-xl">
-                    <div class="flex flex-col">
-                        <div class="grid grid-cols-[minmax(0,1fr)_2fr_2fr_2fr] bg-white p-2 rounded-t-lg">
-                            <div class="flex justify-center items-center py-2 font-semibold text-gray-700">Группа</div>
-                            <div class="flex justify-center items-center py-2 font-semibold text-gray-700">ФИО</div>
-                            <div class="flex justify-center items-center py-2 font-semibold text-gray-700">Курс</div>
-                            <div class="flex justify-center items-center py-2 font-semibold text-gray-700">Действие</div>
-                        </div>
-                        <div class="grid grid-cols-[minmax(0,1fr)_2fr_2fr_2fr] bg-white p-2 rounded-b-lg">
-                            <div class="flex justify-center items-center py-2 text-[#677483]">427/2023</div>
-                            <div class="flex justify-center items-center py-2 text-[#677483]">Кузьмин И.В.</div>
-                            <div class="flex justify-center items-center py-2 text-[#677483]">РHP начинающий</div>
-                            <div class="flex justify-center hover:bg-blue-500 px-4 py-2 rounded-xl transition duration-700 ease-in-out items-center hover:text-white text-blue-500 cursor-pointer">Проверить</div>
-                        </div>
-                        <hr class="border-gray-300">
-                        <div class="grid grid-cols-[minmax(0,1fr)_2fr_2fr_2fr] bg-white p-2 rounded-b-lg">
-                            <div class="flex justify-center items-center py-2 text-[#677483]">427/2023</div>
-                            <div class="flex justify-center items-center py-2 text-[#677483]">Кузьмин И.В.</div>
-                            <div class="flex justify-center items-center py-2 text-[#677483]">РHP начинающий</div>
-                            <div class="flex justify-center hover:bg-blue-500 px-4 py-2 rounded-xl items-center transition duration-700 ease-in-out hover:text-white text-blue-500 cursor-pointer">Проверить</div>
-                        </div>
-                        <hr class="border-gray-300">
-                        <div class="grid grid-cols-[minmax(0,1fr)_2fr_2fr_2fr] bg-white p-2 rounded-b-lg">
-                            <div class="flex justify-center items-center py-2 text-[#677483]">427/2023</div>
-                            <div class="flex justify-center items-center py-2 text-[#677483]">Кузьмин И.В.</div>
-                            <div class="flex justify-center items-center py-2 text-[#677483]">РHP начинающий</div>
-                            <div class="flex justify-center hover:bg-blue-500 px-4 py-2 rounded-xl items-center transition duration-700 ease-in-out hover:text-white text-blue-500 cursor-pointer">Проверить</div>
-                        </div>
-                        <hr class="border-gray-300">
-                        <div class="grid grid-cols-[minmax(0,1fr)_2fr_2fr_2fr] bg-white p-2 rounded-b-lg">
-                            <div class="flex justify-center items-center py-2 text-[#677483]">427/2023</div>
-                            <div class="flex justify-center items-center py-2 text-[#677483]">Кузьмин И.В.</div>
-                            <div class="flex justify-center items-center py-2 text-[#677483]">РHP начинающий</div>
-                            <div class="flex justify-center hover:bg-blue-500 px-4 py-2 rounded-xl items-center transition duration-700 ease-in-out hover:text-white text-blue-500 cursor-pointer">Проверить</div>
-                        </div>
-                        <hr class="border-gray-300">
-                        <div class="grid grid-cols-[minmax(0,1fr)_2fr_2fr_2fr] bg-white p-2 rounded-b-lg">
-                            <div class="flex justify-center items-center py-2 text-[#677483]">427/2023</div>
-                            <div class="flex justify-center items-center py-2 text-[#677483]">Кузьмин И.В.</div>
-                            <div class="flex justify-center items-center py-2 text-[#677483]">РHP начинающий</div>
-                            <div class="flex justify-center hover:bg-blue-500 px-4 py-2 rounded-xl items-center transition duration-700 ease-in-out hover:text-white text-blue-500 cursor-pointer">Проверить</div>
-                        </div>
-                    </div>
-                </div>
+        </div>
+        <div class="bg-white rounded-xl px-5 pt-5 pb-4 flex flex-col justify-between relative">
+            <h2 class="text-xl mb-4">Сменить ник телеграм</h2>
+            <form action="{{ route('teacher.setting.update.telegram') }}" method="post">
+                @csrf
+                <label for="telegram_username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@if(isset(auth()->user()->telegram_username)) Тукущий ник: {{ auth()->user()->telegram_username }}  @else Ник @endif</label>
+                <input type="text" id="telegram_username" name="telegram_username"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 @error('telegram_username') border-red-500 @enderror"
+                       placeholder="Введите ник телеграм" value="{{ old('telegram_username') }}"/>
 
+                @error('telegram_username')
+                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">Указывайте корректный ник (без @)</p>
+                <input type="submit"
+                       class="bg-gray-900 mt-3 cursor-pointer text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                       value="Сменить">
+            </form>
+            <div class="absolute top-5 right-3">
+                <button type="button" data-modal-target="crypto-modal" data-modal-toggle="crypto-modal">
+                    <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                    </svg>
+                </button>
             </div>
-            <div class="w-1/4 gap-y-6 flex flex-col">
-                <div class="flex rounded-xl bg-white flex-col p-6 items-center">
-                    <img src="{{ asset('images/user.png') }}" alt="" class="w-16 h-16 mb-4">
-                    <h3 class="mb-2">Альберт Наумович</h3>
-                    <p>Преподователь</p>
+        </div>
+    </div>
+    <div id="crypto-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Подключение уведомления
+                    </h3>
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crypto-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
                 </div>
-                <div class="flex rounded-xl bg-white flex-col gap-y-6 p-6 items-center">
-                    <img src="{{ asset('images/spisok.png') }}" alt="" class="w-16">
-                    <div class="grid grid-cols-2 w-full gap-3">
-                        <div class="flex justify-center shadow-md gap-2 bg-white rounded-xl text-center p-2">
-                            <a href="" class="text-md"><p class="text-[14px] mb-1">Группа</p>437/10</a>
-                        </div>
-                        <div class="flex justify-center shadow-md gap-2 bg-white rounded-xl text-center p-2">
-                            <a href="" class="text-md"><p class="text-[14px] mb-1">Группа</p>437/10</a>
-                        </div>
-                    </div>
+                <!-- Modal body -->
+                <div class="p-4 md:p-5">
+                    <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Для старта получения уведомлений нажать кнопку 'start' у бота перед тем как сменить ник.</p>
+                    <ul class="my-4 space-y-3">
+                        <li>
+                            <a href="https://t.me/kplatforma_bot" class="flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
+                                <i class='bx bxl-telegram'></i>
+                                <span class="flex-1 ms-3 whitespace-nowrap">Telegram bot</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
-    <script>
-        const sideLinks = document.querySelectorAll('.sidebar .side-menu li a:not(.logout)');
 
-        sideLinks.forEach(item => {
-            const li = item.parentElement;
-            item.addEventListener('click', () => {
-                sideLinks.forEach(i => {
-                    i.parentElement.classList.remove('active');
-                })
-                li.classList.add('active');
-            })
-        });
-
-        const menuBar = document.querySelector('.content nav .bx.bx-menu');
-        const sideBar = document.querySelector('.sidebar');
-
-        menuBar.addEventListener('click', () => {
-            sideBar.classList.toggle('close');
-        });
-
-        const searchBtn = document.querySelector('.content nav form .form-input button');
-        const searchBtnIcon = document.querySelector('.content nav form .form-input button .bx');
-        const searchForm = document.querySelector('.content nav form');
-
-        searchBtn.addEventListener('click', function (e) {
-            if (window.innerWidth < 576) {
-                e.preventDefault;
-                searchForm.classList.toggle('show');
-                if (searchForm.classList.contains('show')) {
-                    searchBtnIcon.classList.replace('bx-search', 'bx-x');
-                } else {
-                    searchBtnIcon.classList.replace('bx-x', 'bx-search');
-                }
-            }
-        });
-
-        window.addEventListener('resize', () => {
-            if (window.innerWidth < 768) {
-                sideBar.classList.add('close');
-            } else {
-                sideBar.classList.remove('close');
-            }
-            if (window.innerWidth > 576) {
-                searchBtnIcon.classList.replace('bx-x', 'bx-search');
-                searchForm.classList.remove('show');
-            }
-        });
-
-        const toggler = document.getElementById('theme-toggle');
-
-        toggler.addEventListener('change', function () {
-            if (this.checked) {
-                document.body.classList.add('dark');
-            } else {
-                document.body.classList.remove('dark');
-            }
-        });
-    </script>
 @endsection

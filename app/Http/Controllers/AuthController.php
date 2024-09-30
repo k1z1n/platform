@@ -3,16 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function showConfirm()
+
+    protected UserService $userService;
+
+    public function __construct(UserService $userService)
     {
-        return view('page.auth.confirm');
+        $this->userService = $userService;
     }
+
     public function showLogin()
     {
         return view('page.auth.sign-in');
@@ -20,22 +25,19 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $data = $request->validate([
-            'login' => 'required',
-            'password' => 'required'
-        ]);
-        if(auth()->attempt($data)){
-            if(auth()->user()->role === 'admin'){
-                return redirect()->intended(route('admin.main'));
-            }
-            return redirect()->intended(route('student.main'));
+        $data = $this->userService->validateLoginUser($request);
+
+        if (auth()->attempt($data)) {
+            $role = auth()->user()->role;
+            return redirect()->intended($this->userService->redirectDuringLogin($role));
         }
-        return back()->withErrors([
+        return redirect()->back()->withErrors([
             'login' => 'Неверный логин или пароль.',
         ]);
     }
 
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         auth()->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

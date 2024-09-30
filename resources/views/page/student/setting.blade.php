@@ -1,7 +1,8 @@
 @extends('includes.layout')
+@section('h2-name', 'Настройки')
 @section('content')
-    <div class="flex gap-5">
-        <div class="bg-white rounded-xl px-5 pt-5 pb-4 flex flex-col w-1/2">
+    <div class="flex gap-5 flex-col">
+        <div class="bg-white rounded-xl px-5 pt-5 pb-4 flex flex-col">
             <h2 class="text-xl mb-4">Сменить аватар</h2>
             <div class="flex"></div>
             <img src="{{ asset('images/user.png') }}" alt="" class="w-16 flex justify-center mb-4">
@@ -16,75 +17,64 @@
                        value="Сменить">
             </form>
         </div>
-        <div class="bg-white rounded-xl px-5 pt-5 pb-4 flex flex-col w-1/2 justify-between">
+        <div class="bg-white rounded-xl px-5 pt-5 pb-4 flex flex-col justify-between relative">
             <h2 class="text-xl mb-4">Сменить ник телеграм</h2>
-            <form action="" method="post">
-                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Ник</label>
-                <input type="email" id="email"
-                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                       placeholder="name@flowbite.com" required/>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">Указывать корректно</p>
+            <form action="{{ route('student.setting.update.telegram') }}" method="post">
+                @csrf
+                <label for="telegram_username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">@if(isset(auth()->user()->telegram_username)) Тукущий ник: {{ auth()->user()->telegram_username }}  @else Ник @endif</label>
+                <input type="text" id="telegram_username" name="telegram_username"
+                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 @error('telegram_username') border-red-500 @enderror"
+                       placeholder="Введите ник телеграм" value="{{ old('telegram_username') }}"/>
+
+                @error('telegram_username')
+                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">Указывайте корректный ник (без @)</p>
                 <input type="submit"
                        class="bg-gray-900 mt-3 cursor-pointer text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                        value="Сменить">
             </form>
+            <div class="absolute top-5 right-3">
+                <button type="button" data-modal-target="crypto-modal" data-modal-toggle="crypto-modal">
+                    <svg class="flex-shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
-    <!-- Include Quill stylesheet -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
-    <!-- Include Quill library -->
-    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
-    <div class="container">
-        <h1>Создать Контент</h1>
-
-        <!-- Форма создания контента -->
-            <form id="quillForm" method="POST" action="{{ route('student.content.store') }}">
-                @csrf
-        <div id="editor">
+    <div id="crypto-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Подключение уведомления
+                    </h3>
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crypto-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <div class="p-4 md:p-5">
+                    <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Для старта получения уведомлений нажать кнопку 'start' у бота перед тем как сменить ник.</p>
+                    <ul class="my-4 space-y-3">
+                        <li>
+                            <a href="https://t.me/kplatforma_bot" class="flex items-center p-3 text-base font-bold text-gray-900 rounded-lg bg-gray-50 hover:bg-gray-100 group hover:shadow dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white">
+                                <i class='bx bxl-telegram'></i>
+                                <span class="flex-1 ms-3 whitespace-nowrap">Telegram bot</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-                <input type="hidden" id="quillContent" name="content">
-                <button type="submit">Save</button>
-            </form>
-
-        <!-- Подключение скриптов Quill -->
-{{--        <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>--}}
-        <script>
-            var quill = new Quill('#editor', {
-                theme: 'snow',
-                modules: {
-                    toolbar: [
-                        // Основные форматирования
-                        [{ 'font': [] }, { 'size': [] }],
-                        ['bold', 'italic', 'underline', 'strike'], // жирный, курсив, подчеркнутый, зачеркнутый
-                        [{ 'color': [] }, { 'background': [] }], // цвет текста, цвет фона
-                        ['blockquote', 'code-block'], // цитата, код
-
-                        // Форматирование текста
-                        [{ 'header': 1 }, { 'header': 2 }, { 'header': 3 }, { 'header': 4 }], // заголовки
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }], // упорядоченный, маркированный список
-                        [{ 'script': 'sub'}, { 'script': 'super' }], // подстрочный, надстрочный текст
-                        [{ 'indent': '-1'}, { 'indent': '+1' }], // уменьшить/увеличить отступ
-                        [{ 'direction': 'rtl' }], // направление текста
-
-                        // Стили текста
-                        [{ 'align': [] }], // выравнивание текста
-
-                        // Вставка медиа и разделителей
-                        ['link', 'image', 'video', 'formula'], // ссылка, изображение, видео, формула
-
-                        // Управление и очистка
-                        ['clean'] // очистить форматирование
-                    ]
-                }
-            });
-            document.getElementById('quillForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                var content = quill.root.innerHTML;
-                document.getElementById('quillContent').value = content;
-                this.submit();
-            });
-        </script>
     </div>
+
 
 @endsection

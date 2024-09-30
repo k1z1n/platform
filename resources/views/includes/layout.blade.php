@@ -6,12 +6,93 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <!-- Include Quill library -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link type="image/x-icon" rel="shortcut icon" href="{{ asset('icons/infinity_3Hl_icon.ico') }}">
     <title>{{ config('app.name') }}</title>
 </head>
 <body>
+<script async>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sideLinks = document.querySelectorAll('.sidebar .side-menu li a:not(.logout)');
+        const menuBar = document.querySelector('.content nav .bx.bx-menu');
+        const sideBar = document.querySelector('.sidebar');
+
+        // Проверка состояния меню при загрузке страницы
+        // Скрываем меню до завершения проверки состояния
+        sideBar.style.opacity = '0';
+        sideBar.style.visibility = 'hidden';
+
+        // Проверка состояния меню при загрузке страницы
+        if (localStorage.getItem('sidebarClosed') === 'true') {
+            sideBar.classList.add('close');
+        } else {
+            sideBar.classList.remove('close');
+        }
+
+        // Показываем меню после завершения проверки состояния
+        sideBar.style.opacity = '1';
+        sideBar.style.visibility = 'visible';
+
+        // Добавление события клика для открытия/закрытия меню
+        menuBar.addEventListener('click', () => {
+            sideBar.classList.toggle('close');
+            // Сохранение состояния меню в localStorage
+            localStorage.setItem('sidebarClosed', sideBar.classList.contains('close'));
+        });
+
+        sideLinks.forEach(item => {
+            const li = item.parentElement;
+            item.addEventListener('click', () => {
+                sideLinks.forEach(i => {
+                    i.parentElement.classList.remove('active');
+                })
+                li.classList.add('active');
+            })
+        });
+
+        const searchBtn = document.querySelector('.content nav form .form-input button');
+        const searchBtnIcon = document.querySelector('.content nav form .form-input button .bx');
+        const searchForm = document.querySelector('.content nav form');
+
+        searchBtn.addEventListener('click', function (e) {
+            if (window.innerWidth < 576) {
+                e.preventDefault();
+                searchForm.classList.toggle('show');
+                if (searchForm.classList.contains('show')) {
+                    searchBtnIcon.classList.replace('bx-search', 'bx-x');
+                } else {
+                    searchBtnIcon.classList.replace('bx-x', 'bx-search');
+                }
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth < 768) {
+                sideBar.classList.add('close');
+            } else {
+                sideBar.classList.remove('close');
+            }
+            if (window.innerWidth > 576) {
+                searchBtnIcon.classList.replace('bx-x', 'bx-search');
+                searchForm.classList.remove('show');
+            }
+        });
+
+        const toggler = document.getElementById('theme-toggle');
+
+        toggler.addEventListener('change', function () {
+            if (this.checked) {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+        });
+    });
+</script>
 @adminArea
 <div class="sidebar">
     <a href="{{ route('admin.main') }}" class="logo">
@@ -24,19 +105,9 @@
                 <i class='bx bxs-dashboard'></i> Главная
             </a>
         </li>
-        <li class="{{ request()->is('admin/courses') || request()->is('admin/courses/*') ? 'active' : '' }}">
+        <li class="{{ request()->is('admin/courses') || request()->is('admin/courses/*') || request()->is('admin/course/module/*') ? 'active' : '' }}">
             <a href="{{ route('admin.courses') }}">
                 <i class='bx bx-analyse'></i> Курсы
-            </a>
-        </li>
-        <li class="{{ request()->is('admin/requests') || request()->is('admin/requests/*') ? 'active' : '' }}">
-            <a href="{{ route('admin.requests') }}">
-                <i class='bx bx-analyse'></i> Запросы
-            </a>
-        </li>
-        <li class="{{ request()->is('admin/generate') ? 'active' : '' }}">
-            <a href="{{ route('admin.generate') }}">
-                <i class='bx bx-plus-circle'></i> Генерация
             </a>
         </li>
         <li class="{{ request()->is('admin/add/course') ? 'active' : '' }}">
@@ -44,9 +115,9 @@
                 <i class='bx bx-plus'></i> Добавить курс
             </a>
         </li>
-        <li class="{{ request()->is('admin/add/group') ? 'active' : '' }}">
-            <a href="{{ route('admin.add.group') }}">
-                <i class='bx bx-plus'></i> Добавить группа
+        <li class="{{ request()->is('admin/requests') || request()->is('admin/requests/*') ? 'active' : '' }}">
+            <a href="{{ route('admin.requests') }}">
+                <i class='bx bx-analyse'></i> Запросы
             </a>
         </li>
         <li class="{{ request()->is('admin/list') ? 'active' : '' }}">
@@ -54,13 +125,33 @@
                 <i class='bx bx-group'></i> Пользователи
             </a>
         </li>
-        <li class="{{ request()->is('admin/visits') ? 'active' : '' }}">
-            <a href="{{ route('admin.list') }}">
-                <i class='bx bx-list-ol'></i> Списки
+        <li class="{{ request()->is('admin/generate') ? 'active' : '' }}">
+            <a href="{{ route('admin.generate') }}">
+                <i class='bx bx-plus-circle'></i> Генерация
             </a>
         </li>
-        <li class="{{ request()->is('student/setting') ? 'active' : '' }}">
-            <a href="{{ route('student.setting') }}">
+        <li class="{{ request()->is('admin/add/group') ? 'active' : '' }}">
+            <a href="{{ route('admin.add.group') }}">
+                <i class='bx bx-plus'></i> Добавить группа
+            </a>
+        </li>
+        <li class="{{ request()->is('admin/groups') ? 'active' : '' }}">
+            <a href="{{ route('admin.groups') }}">
+                <i class='bx bx-list-ul'></i>Список групп
+            </a>
+        </li>
+        <li class="{{ request()->is('admin/show/tasks') ? 'active' : '' }}">
+            <a href="{{ route('admin.show.tasks') }}">
+                <i class='bx bx-list-ol'></i>Задания
+            </a>
+        </li>
+        <li class="{{ request()->is('admin/show/teachers') || request()->is('admin/show/teachers/*') ? 'active' : '' }}">
+            <a href="{{ route('admin.show.teachers') }}">
+                <i class='bx bx-chalkboard'></i>Преподаватели
+            </a>
+        </li>
+        <li class="{{ request()->is('admin/setting') ? 'active' : '' }}">
+            <a href="{{ route('admin.setting') }}">
                 <i class='bx bx-cog'></i> Настройки
             </a>
         </li>
@@ -81,7 +172,7 @@
 </div>
 @endadminArea
 @studentArea
-<div class="sidebar">
+<div class="sidebar close">
     <a href="{{ route('student.main') }}" class="logo">
         <img src="{{ asset('icons/infinity.png') }}" alt="" class="w-10 ml-3 mr-2">
         <div class="logo-name gradient">платформа</div>
@@ -97,11 +188,16 @@
                 <i class='bx bx-analyse'></i> Курсы
             </a>
         </li>
-        <li class="{{ request()->is('student/content/list') ? 'active' : '' }}">
-            <a href="{{ route('student.student.list') }}">
-                <i class='bx bx-list-ol'></i> Списки
+        <li class="{{ request()->is('student/theory')|| request()->is('student/theory/*') ? 'active' : '' }}">
+            <a href="{{ route('student.theory') }}">
+                <i class='bx bx-book'></i> Теория
             </a>
         </li>
+{{--        <li class="{{ request()->is('student/content/list') ? 'active' : '' }}">--}}
+{{--            <a href="{{ route('student.student.list') }}">--}}
+{{--                <i class='bx bx-list-ol'></i> Списки--}}
+{{--            </a>--}}
+{{--        </li>--}}
         <li class="{{ request()->is('student/setting') ? 'active' : '' }}">
             <a href="{{ route('student.setting') }}">
                 <i class='bx bx-cog'></i> Настройки
@@ -186,7 +282,7 @@
                 <img src="{{ asset('images/spisok.png') }}" alt="" class="w-16">
                 <div class="grid w-full gap-3">
                     <a href="{{ auth()->user()->group->link }}" class="flex justify-center shadow-md gap-2 bg-white rounded-xl text-center p-2">
-                        <p class="text-[16px]"><span class="text-[16px] mb-1 text-[#677483]">Группа</span><br>427/2024
+                        <p class="text-[16px]"><span class="text-[16px] mb-1 text-[#677483]">Группа</span><br>{{ auth()->user()->group->title }}
                         </p>
                     </a>
                 </div>
@@ -195,73 +291,5 @@
         @endstudentArea
     </main>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const sideLinks = document.querySelectorAll('.sidebar .side-menu li a:not(.logout)');
-        const menuBar = document.querySelector('.content nav .bx.bx-menu');
-        const sideBar = document.querySelector('.sidebar');
-
-        // Проверка состояния меню при загрузке страницы
-        if (localStorage.getItem('sidebarClosed') === 'true') {
-            sideBar.classList.add('close');
-        }
-
-        // Добавление события клика для открытия/закрытия меню
-        menuBar.addEventListener('click', () => {
-            sideBar.classList.toggle('close');
-            // Сохранение состояния меню в localStorage
-            localStorage.setItem('sidebarClosed', sideBar.classList.contains('close'));
-        });
-
-        sideLinks.forEach(item => {
-            const li = item.parentElement;
-            item.addEventListener('click', () => {
-                sideLinks.forEach(i => {
-                    i.parentElement.classList.remove('active');
-                })
-                li.classList.add('active');
-            })
-        });
-
-        const searchBtn = document.querySelector('.content nav form .form-input button');
-        const searchBtnIcon = document.querySelector('.content nav form .form-input button .bx');
-        const searchForm = document.querySelector('.content nav form');
-
-        searchBtn.addEventListener('click', function (e) {
-            if (window.innerWidth < 576) {
-                e.preventDefault();
-                searchForm.classList.toggle('show');
-                if (searchForm.classList.contains('show')) {
-                    searchBtnIcon.classList.replace('bx-search', 'bx-x');
-                } else {
-                    searchBtnIcon.classList.replace('bx-x', 'bx-search');
-                }
-            }
-        });
-
-        window.addEventListener('resize', () => {
-            if (window.innerWidth < 768) {
-                sideBar.classList.add('close');
-            } else {
-                sideBar.classList.remove('close');
-            }
-            if (window.innerWidth > 576) {
-                searchBtnIcon.classList.replace('bx-x', 'bx-search');
-                searchForm.classList.remove('show');
-            }
-        });
-
-        const toggler = document.getElementById('theme-toggle');
-
-        toggler.addEventListener('change', function () {
-            if (this.checked) {
-                document.body.classList.add('dark');
-            } else {
-                document.body.classList.remove('dark');
-            }
-        });
-    });
-</script>
 </body>
 </html>

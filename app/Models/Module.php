@@ -17,9 +17,12 @@ class Module extends Model
         'stat',
         'status',
         'course_id',
+        'module',
+        'slug'
     ];
 
     public function course(){
         return $this->belongsTo(Module::class);
     }
+
 }

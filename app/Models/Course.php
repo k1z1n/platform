@@ -12,7 +12,8 @@ class Course extends Model
     protected $fillable = [
         'title',
         'description',
-        'logo'
+        'logo',
+        'slug'
     ];
 
     public function modules(){
@@ -23,4 +24,5 @@ class Course extends Model
     {
         return $this->hasMany(Request::class);
     }
+
 }

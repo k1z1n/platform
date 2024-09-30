@@ -1,5 +1,5 @@
 @extends('includes.layout')
-@section('h2-name', 'Курсы')
+@section('h2-name', 'Группы')
 @section('content')
     <div class="grid grid-cols-5 gap-5">
         @foreach($groups as $group)

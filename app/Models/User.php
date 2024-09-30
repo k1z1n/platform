@@ -30,13 +30,20 @@ class User extends Authenticatable
         'group_id'
     ];
 
-    public function group(){
+    public function group()
+    {
         return $this->belongsTo(Group::class);
     }
 
     public function requests()
     {
         return $this->hasMany(Request::class);
+    }
+
+
+    public function subdomains()
+    {
+        return $this->hasMany(Subdomain::class, 'user_id');
     }
 
     /**

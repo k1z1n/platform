@@ -679,3 +679,29 @@ body{
 .z-1000{
     z-index: 3001;
 }
+
+
+
+
+
+
+.header-text{
+    @apply text-xl font-semibold text-gray-900 dark:text-white
+}
+
+.code{
+    @apply bg-gray-200 p-4 rounded-lg text-sm font-mono text-gray-800
+}
+
+.h2{
+    @apply text-lg font-semibold text-gray-800
+}
+
+.h3{
+    @apply font-semibold text-gray-600
+}
+
+
+.p{
+    @apply text-gray-700
+}

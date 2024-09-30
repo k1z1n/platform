@@ -2,51 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\HelperService;
+use App\Services\RequestService;
 use Illuminate\Http\Request;
 use App\Models\Request as RequestModel;
 
 class RequestController extends Controller
 {
+
+    protected RequestService $requestService;
+    protected HelperService $helperService;
+
+    public function __construct(
+        RequestService $requestService,
+        HelperService  $helperService
+    )
+    {
+        $this->requestService = $requestService;
+        $this->helperService = $helperService;
+    }
+
     public function record($id)
     {
         $userId = auth()->id();
 
-        $pendingRequest = RequestModel::where('user_id', $userId)
-            ->where('course_id', $id)
-            ->where('status', 'pending')
-            ->first();
+        $requests = $this->requestService->checkExistingRequests($userId, $id);
 
-        $acceptedRequest = RequestModel::where('user_id', $userId)
-            ->where('course_id', $id)
-            ->where('status', 'accepted')
-            ->first();
-
-        $rejectedRequest = RequestModel::where('user_id', $userId)
-            ->where('course_id', $id)
-            ->where('status', 'rejected')
-            ->first();
-
-        if ($pendingRequest) {
-            return redirect()->back()->with('info', 'Ваша заявка в обработке.');
+        if($redirect = $this->requestService->redirectForRequest($requests, $id)){
+            return $redirect;
         }
 
-        if ($acceptedRequest) {
-            return redirect()->back()->with('info', 'Ваша записи одобрена.');
-        }
+        $this->requestService->createRequest($userId, $id);
 
-        if ($rejectedRequest) {
-            return redirect()->back()->with('info', 'Ваша заявка отклонена на этот курс.');
-        }
-
-
-        // Сохранение заявки
-        $data = [
-            'user_id' => $userId,
-            'course_id' => $id,
-        ];
-        RequestModel::create($data);
-
-        return redirect()->back()->with('success', 'Заявка успешно отправлена.');
+        return $this->helperService->returnWithSuccess('student.one.course', 'Ваша заявка в обработке.', $id);
     }
 
 }

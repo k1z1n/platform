@@ -43,5 +43,9 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('studentArea', function () {
             return request()->is('student') || request()->is('student/*');
         });
+
+        Blade::if('teacherArea', function () {
+            return request()->is('teacher') || request()->is('teacher/*');
+        });
     }
 }

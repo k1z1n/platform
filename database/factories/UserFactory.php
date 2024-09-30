@@ -36,6 +36,7 @@ class UserFactory extends Factory
             'password' => Hash::make($plainPassword),
             'pp' => $plainPassword,
             'role' => 'admin',
+            'group_id' => null,
             'remember_token' => Str::random(10),
         ];
     }

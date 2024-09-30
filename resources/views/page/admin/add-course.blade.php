@@ -1,5 +1,6 @@
 @extends('includes.layout')
 @section('content')
+    @include('includes.error')
     <div class="flex gap-5 h-full">
         <div class="w-full flex gap-5 h-full">
             <form action="{{ route('admin.store.course') }}" method="post" class="flex gap-5 h-full w-full" enctype="multipart/form-data">
